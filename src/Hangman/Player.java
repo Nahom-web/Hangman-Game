@@ -18,12 +18,6 @@ public class Player implements java.io.Serializable {
 		this.gamePlayed = 0;
 	}
 
-	public Player(String n, int w, int gp) {
-		this.name = n;
-		this.wins = w;
-		this.gamePlayed = gp;
-	}
-
 	public String getName() {
 		return name;
 	}

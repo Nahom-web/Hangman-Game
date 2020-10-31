@@ -13,22 +13,28 @@ public class Scoreboard_Panel extends JPanel {
 	private JTextArea areaDisplay;
 	private int lineLength = 10;
 	private int indent = 2;
-
+	HangmanSaveGame hangmanSaveGame;
+	Scoreboard scoreboard;
 
 	/**
 	 * Create the panel.
+	 * 
+	 * @throws ClassNotFoundException
 	 */
-	public Scoreboard_Panel() {
+	public Scoreboard_Panel() throws ClassNotFoundException {
+		hangmanSaveGame = new HangmanSaveGame();
+		scoreboard = new Scoreboard();
+
 		setBackground(Color.BLUE);
 		areaDisplay = new JTextArea(15, 45);
 		areaDisplay.setBackground(new Color(255, 255, 255));
 		areaDisplay.setEditable(false);
 		areaDisplay.setFont(new Font("Courier New", 0, 11));
 		add(new JScrollPane(areaDisplay), BorderLayout.CENTER);
-		displayHeading();
+		displayPlayers();
 	}
 
-	private void displayHeading() {
+	private void displayPlayers() throws ClassNotFoundException {
 
 		String title = "All Players";
 		String underline = "-----------";
@@ -45,16 +51,15 @@ public class Scoreboard_Panel extends JPanel {
 		for (int i = 0; i < lineLength; ++i)
 			areaDisplay.append("-");
 		areaDisplay.append("\n");
-	}
-	
-	//DoublyLinkedList<Player> scoreboard
 
-	public void displayPlayers(DoublyLinkedList<Player> scoreboard) {
-		for (int i = 0; i < scoreboard.getLength(); i++) {
-			areaDisplay.append(String.format("%-19s%-8s%-3s", scoreboard.getElementAt(i).getName(),
-					scoreboard.getElementAt(i).getWins(), scoreboard.getElementAt(i).getGamePlayed()));
-			areaDisplay.append("\n");
-		}	
+		if (hangmanSaveGame.readPlayers() != null) {
+			scoreboard.scoreboard = hangmanSaveGame.readPlayers();
+			for (int i = 0; i < scoreboard.scoreboard.getLength(); i++) {
+				Player player = scoreboard.scoreboard.getElementAt(i);
+				areaDisplay.append(String.format("%-19s%-8s%-3s\n", i + 1 + " " + player.getName(), player.getWins(),
+						player.getGamePlayed()));
+			}
+		}
 	}
 
 }

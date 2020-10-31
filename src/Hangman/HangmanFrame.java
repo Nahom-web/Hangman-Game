@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.HeadlessException;
 
 public class HangmanFrame extends JFrame implements ActionListener {
 
@@ -225,11 +226,14 @@ public class HangmanFrame extends JFrame implements ActionListener {
 
 		createAlphabetButtons();
 
-		if (hangmanSaveGame.readPlayers() != null) {
+		if (hangmanSaveGame.readPlayers() == null) {
+			btnResumeGame.setEnabled(false);
+		}
+
+		else {
 			scoreboard.scoreboard = hangmanSaveGame.readPlayers();
 			for (int i = 0; i < scoreboard.scoreboard.getLength(); i++) {
 				comboBoxReturningPlayers.addItem(scoreboard.scoreboard.getElementAt(i).getName());
-				System.out.println(scoreboard.scoreboard.getElementAt(i).getName() + " " + scoreboard.scoreboard.getElementAt(i).getGamePlayed() + " " + scoreboard.scoreboard.getElementAt(i).getWins());
 			}
 		}
 
@@ -259,6 +263,7 @@ public class HangmanFrame extends JFrame implements ActionListener {
 
 		if (e.getSource() == btnResumeGame) {
 			try {
+				player = comboBoxReturningPlayers.getSelectedItem().toString();
 				resumeGame();
 			} catch (ClassNotFoundException e1) {
 				e1.printStackTrace();
@@ -275,8 +280,13 @@ public class HangmanFrame extends JFrame implements ActionListener {
 			JOptionPane.showMessageDialog(this, new Rules_Panel(), "Rules", JOptionPane.PLAIN_MESSAGE);
 		}
 		if (e.getSource() == mntmScoreboard) {
-			scoreboard_panel.displayPlayers(scoreboard.scoreboard);
-			JOptionPane.showMessageDialog(this, new Scoreboard_Panel(), "Scoreboard", JOptionPane.PLAIN_MESSAGE);
+			try {
+				JOptionPane.showMessageDialog(this, new Scoreboard_Panel(), "Scoreboard", JOptionPane.PLAIN_MESSAGE);
+			} catch (HeadlessException e1) {
+				e1.printStackTrace();
+			} catch (ClassNotFoundException e1) {
+				e1.printStackTrace();
+			}
 		}
 
 		enterGuess(e);
@@ -293,8 +303,11 @@ public class HangmanFrame extends JFrame implements ActionListener {
 					if (hangman.isGameLose()) {
 						JOptionPane.showMessageDialog(this, " Sorry you have guessed 6 letters wrong", "Lost!",
 								JOptionPane.PLAIN_MESSAGE);
+						scoreboard.gamePlayed(player, false);
+						hangmanSaveGame.savePlayers(scoreboard.scoreboard);
 						startNewGame();
 					} else {
+
 						char guess = alphabet[i][j].getText().toLowerCase().charAt(0);
 
 						alphabet[i][j].setEnabled(false);
@@ -309,6 +322,10 @@ public class HangmanFrame extends JFrame implements ActionListener {
 								lblWordVal.setText(hangman.updateWordWithGuess(guess));
 								if (hangman.isGameWon()) {
 									wonGame();
+								}
+
+								if (hangman.getNumOfGuesses() == 6) {
+									mntmHint.setEnabled(false);
 								}
 
 							} // if (hangman.checkGuess(guess))
@@ -338,9 +355,9 @@ public class HangmanFrame extends JFrame implements ActionListener {
 		if (hangman.checkName(fldName.getText())) {
 			player = fldName.getText();
 			scoreboard.addPlayer(player);
-			lblWelcome.setText("Welcome to Hangman, " + fldName.getText() + "!");
 			fldName.setText("");
 			hangman = new Hangman(hangmanWordList.recieveAWord());
+			lblWelcome.setText("Welcome to Hangman, " + player + "!");
 			lblWordVal.setText(hangman.printUnderscores());
 			lblhangmanPicture.setIcon(new ImageIcon("hangman.png"));
 			namePanel.setVisible(false);
@@ -362,6 +379,7 @@ public class HangmanFrame extends JFrame implements ActionListener {
 		JOptionPane.showMessageDialog(this, "congradulations, you finished the word", "Word Complete!",
 				JOptionPane.PLAIN_MESSAGE);
 		scoreboard.gamePlayed(player, true);
+		hangmanSaveGame.savePlayers(scoreboard.scoreboard);
 		startNewGame();
 	}
 
@@ -419,22 +437,31 @@ public class HangmanFrame extends JFrame implements ActionListener {
 
 	public void hint() {
 
-		if (hangman.recieveHint()) {
-			lblWordVal.setText(hangman.toString());
+		if (hangman.canHint()) {
+			if (hangman.recieveHint()) {
+				lblWordVal.setText(hangman.toString());
 
-			String hangmanPic = "hangman" + hangman.getNumOfGuesses() + ".png";
-			lblhangmanPicture.setIcon(new ImageIcon(hangmanPic));
+				String hangmanPic = "hangman" + hangman.getNumOfGuesses() + ".png";
+				lblhangmanPicture.setIcon(new ImageIcon(hangmanPic));
 
-			if (hangman.isGameWon()) {
-				wonGame();
-			}
+				if (hangman.isGameWon()) {
+					wonGame();
+				}
 
-			if (hangman.isGameLose()) {
-				startNewGame();
+				if (hangman.isGameLose()) {
+					startNewGame();
+				}
+			} else {
+				mntmHint.setEnabled(false);
+				JOptionPane.showMessageDialog(this, "Cannot hint more than once", "Thank you!",
+						JOptionPane.PLAIN_MESSAGE);
 			}
 		} else {
-			mntmHint.setEnabled(false);
-			JOptionPane.showMessageDialog(this, "Cannot hint more than once", "Thank you!", JOptionPane.PLAIN_MESSAGE);
+			JOptionPane.showMessageDialog(this, " Sorry you can't recieve a hint because you have guessed 6 letters wrong", "Lost!",
+					JOptionPane.PLAIN_MESSAGE);
+			scoreboard.gamePlayed(player, false);
+			hangmanSaveGame.savePlayers(scoreboard.scoreboard);
+			startNewGame();
 		}
 
 	}

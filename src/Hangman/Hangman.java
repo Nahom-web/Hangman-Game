@@ -5,7 +5,6 @@ import java.util.Random;
 
 public class Hangman implements java.io.Serializable {
 
-	private int numOfGuesses;
 	private SinglyLinkedList<Character> lettersFromWord = new SinglyLinkedList<Character>(); // all the letters in the
 																								// // word
 	private SinglyLinkedList<Character> guessedLetters = new SinglyLinkedList<Character>(); // letters guessed in
@@ -21,6 +20,8 @@ public class Hangman implements java.io.Serializable {
 
 	private int numOfHints;
 
+	private int numOfGuesses;
+
 	public Hangman() {
 		this.numOfGuesses = 0;
 		this.numOfHints = 0;
@@ -35,7 +36,6 @@ public class Hangman implements java.io.Serializable {
 		this.numOfHints = 0;
 		this.wordChosen = word;
 		charactersinWord = new Character[this.wordChosen.length()];
-//		System.out.println(this.wordChosen);
 		populateLettersInWord();
 	}
 
@@ -100,12 +100,20 @@ public class Hangman implements java.io.Serializable {
 		System.exit(-1);
 	}
 
+	public boolean canHint() {
+		if (this.numOfGuesses < 6) {
+			return false;
+		} else {
+			return false;
+		}
+	}
+
 	public boolean recieveHint() {
 
 		this.numOfHints++;
 		this.numOfGuesses++;
-		
-		if(!isGameWon()) {
+
+		if (!isGameWon()) {
 			if (this.numOfHints <= 1) {
 				int randomIndex = (int) (Math.random() * this.availableLetters.getLength());
 				this.guessedLetters.add(this.availableLetters.getElementAt(randomIndex));
@@ -114,12 +122,9 @@ public class Hangman implements java.io.Serializable {
 			} else {
 				return false;
 			}
-		}
-		else {
+		} else {
 			return false;
 		}
-
-
 
 	}
 

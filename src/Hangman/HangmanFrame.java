@@ -87,6 +87,7 @@ public class HangmanFrame extends JFrame implements ActionListener {
 	 * @throws ClassNotFoundException
 	 */
 	public HangmanFrame() throws ClassNotFoundException {
+		setTitle("Hangman Game");
 		setBackground(new Color(255, 140, 0));
 		scoreboard = new Scoreboard();
 		scoreboard_panel = new Scoreboard_Panel();
@@ -324,10 +325,6 @@ public class HangmanFrame extends JFrame implements ActionListener {
 									wonGame();
 								}
 
-								if (hangman.getNumOfGuesses() == 6) {
-									mntmHint.setEnabled(false);
-								}
-
 							} // if (hangman.checkGuess(guess))
 
 							else {
@@ -436,11 +433,9 @@ public class HangmanFrame extends JFrame implements ActionListener {
 	}
 
 	public void hint() {
-
 		if (hangman.canHint()) {
 			if (hangman.recieveHint()) {
 				lblWordVal.setText(hangman.toString());
-
 				String hangmanPic = "hangman" + hangman.getNumOfGuesses() + ".png";
 				lblhangmanPicture.setIcon(new ImageIcon(hangmanPic));
 
@@ -448,22 +443,15 @@ public class HangmanFrame extends JFrame implements ActionListener {
 					wonGame();
 				}
 
-				if (hangman.isGameLose()) {
-					startNewGame();
-				}
 			} else {
 				mntmHint.setEnabled(false);
 				JOptionPane.showMessageDialog(this, "Cannot hint more than once", "Thank you!",
 						JOptionPane.PLAIN_MESSAGE);
 			}
 		} else {
-			JOptionPane.showMessageDialog(this, " Sorry you can't recieve a hint because you have guessed 6 letters wrong", "Lost!",
+			JOptionPane.showMessageDialog(this, " Sorry you can't recieve a hint because you have guessed 5 letters wrong and can't lose on a hint", "Lost!",
 					JOptionPane.PLAIN_MESSAGE);
-			scoreboard.gamePlayed(player, false);
-			hangmanSaveGame.savePlayers(scoreboard.scoreboard);
-			startNewGame();
 		}
-
 	}
 
 	public void resumeGame() throws Exception {

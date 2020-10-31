@@ -101,20 +101,18 @@ public class Hangman implements java.io.Serializable {
 	}
 
 	public boolean canHint() {
-		if (this.numOfGuesses < 6) {
-			return false;
+		if (this.numOfGuesses < 5) {
+			return true;
 		} else {
 			return false;
 		}
 	}
 
 	public boolean recieveHint() {
-
-		this.numOfHints++;
-		this.numOfGuesses++;
-
 		if (!isGameWon()) {
 			if (this.numOfHints <= 1) {
+				this.numOfHints++;
+				this.numOfGuesses++;
 				int randomIndex = (int) (Math.random() * this.availableLetters.getLength());
 				this.guessedLetters.add(this.availableLetters.getElementAt(randomIndex));
 				updateWordWithGuess(this.availableLetters.getElementAt(randomIndex));
